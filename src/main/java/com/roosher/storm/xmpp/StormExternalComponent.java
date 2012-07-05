@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp;
+package com.roosher.storm.xmpp;
 
 import org.jivesoftware.whack.ExternalComponentManager;
 

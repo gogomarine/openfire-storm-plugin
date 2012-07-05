@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp;
+package com.roosher.storm.xmpp;
 
 public class Runner {
     public static void main(String[] args) {

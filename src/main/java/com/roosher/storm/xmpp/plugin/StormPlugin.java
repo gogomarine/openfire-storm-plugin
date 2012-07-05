@@ -8,13 +8,11 @@ import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.interceptor.InterceptorManager;
 import org.jivesoftware.openfire.roster.RosterEventDispatcher;
 import org.jivesoftware.util.PropertyEventDispatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.roosher.strom.xmpp.StormIQHandler;
-import com.roosher.strom.xmpp.StormPropertyEventListener;
-import com.roosher.strom.xmpp.StormRosterListener;
-import com.roosher.strom.xmpp.StormPacketInterceptor;
+import com.roosher.storm.xmpp.BlockListPacketInterceptor;
+import com.roosher.storm.xmpp.StormIQHandler;
+import com.roosher.storm.xmpp.StormPropertyEventListener;
+import com.roosher.storm.xmpp.StormRosterListener;
 
 /**
  * 
@@ -23,11 +21,11 @@ import com.roosher.strom.xmpp.StormPacketInterceptor;
  */
 public class StormPlugin implements Plugin{
     
-    private static final Logger logger = LoggerFactory.getLogger(StormPlugin.class);
+//    private static final Logger logger = LoggerFactory.getLogger(StormPlugin.class);
     
     private StormPropertyEventListener haloPropertyEventListener;
     private StormIQHandler debugIQHandler;
-    private StormPacketInterceptor debugPacketInterceptor;
+    private BlockListPacketInterceptor blockListPacketInterceptor;
     
     private InterceptorManager interceptorManager;
     private StormRosterListener rosterListener;
@@ -35,7 +33,7 @@ public class StormPlugin implements Plugin{
     public StormPlugin() {
         haloPropertyEventListener = new StormPropertyEventListener();
         debugIQHandler = new StormIQHandler();
-        debugPacketInterceptor = new StormPacketInterceptor();
+        blockListPacketInterceptor = new BlockListPacketInterceptor();
         
         interceptorManager = InterceptorManager.getInstance();
         
@@ -48,7 +46,9 @@ public class StormPlugin implements Plugin{
         xmppServer.getIQRouter().addHandler(debugIQHandler);
         PropertyEventDispatcher.addListener(haloPropertyEventListener);
         
-        interceptorManager.addInterceptor(debugPacketInterceptor);
+        blockListPacketInterceptor.onStartup();
+        
+        interceptorManager.addInterceptor(blockListPacketInterceptor);
         
         RosterEventDispatcher.addListener(rosterListener);
     }
@@ -60,8 +60,10 @@ public class StormPlugin implements Plugin{
         xmppServer.getIQRouter().removeHandler(debugIQHandler);
         
         PropertyEventDispatcher.removeListener(haloPropertyEventListener);
+
+        interceptorManager.removeInterceptor(blockListPacketInterceptor);
         
-        interceptorManager.removeInterceptor(debugPacketInterceptor);
+        blockListPacketInterceptor.onTerminal();
         
         RosterEventDispatcher.removeListener(rosterListener);
     }

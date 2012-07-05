@@ -6,7 +6,7 @@
 	<packaging>openfire-plugin</packaging>
 	<version>1.0.0</version>
 	<name>storm</name>
-	<description>xmpp plugin for zaizher</description>
+	<description>Zaizher business extension with Openfire</description>
     
     <developers>
         <developer>

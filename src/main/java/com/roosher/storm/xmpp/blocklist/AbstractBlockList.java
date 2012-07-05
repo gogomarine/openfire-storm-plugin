@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp.blacklist;
+package com.roosher.storm.xmpp.blocklist;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -30,6 +30,10 @@ public abstract class AbstractBlockList implements BlockList{
             throw new IllegalArgumentException("new contact jid can't be null");
         }
         
+//        if (StringUtils.equals(newContact.getNode(), "lady")) {
+//            return true;
+//        }
+        
         if (StringUtils.isBlank(username) || !StringUtils.isNumeric(username)) {
             logger.debug("源用户的JID Node节点为空(非数字)，所以直接返回");
             return false;
@@ -49,6 +53,15 @@ public abstract class AbstractBlockList implements BlockList{
         logger.debug(String.format("新添加的用户: [%s] 是否已经被 目标用户: [%s] 屏蔽: [%s]", 
                 sourceId, contactId, blocked));
         return blocked;
+    }
+    
+    @Override
+    public boolean isBlocked(JID source, JID newContact) {
+        if (source == null) {
+            throw new IllegalArgumentException("source jid can't be null");
+        }
+        
+        return isBlocked(source.getNode(), newContact);
     }
     
     public abstract boolean isBlocked(int sourceId, int newContactId);

@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp.blacklist;
+package com.roosher.storm.xmpp.blocklist;
 
 import org.xmpp.packet.JID;
 
@@ -16,6 +16,14 @@ public interface BlockList {
      * @return
      */
     boolean isBlocked(String username, JID newContact);
+    
+    /**
+     * 
+     * @param source
+     * @param newContact
+     * @return
+     */
+    boolean isBlocked(JID source, JID newContact);
     
     /**
      * 主动屏蔽掉某个人

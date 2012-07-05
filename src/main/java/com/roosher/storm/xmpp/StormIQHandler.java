@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp;
+package com.roosher.storm.xmpp;
 
 import org.jivesoftware.openfire.IQHandlerInfo;
 import org.jivesoftware.openfire.auth.UnauthorizedException;
@@ -14,8 +14,8 @@ public class StormIQHandler extends IQHandler{
     private IQHandlerInfo iqHandlerInfo;
     
     public StormIQHandler() {
-        super("halo");
-        iqHandlerInfo = new IQHandlerInfo("halo", "halo-ns");        
+        super("storm");
+        iqHandlerInfo = new IQHandlerInfo("storm", "storm-ns");        
     }
     
     @Override

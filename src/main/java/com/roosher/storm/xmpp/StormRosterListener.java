@@ -1,4 +1,4 @@
-package com.roosher.strom.xmpp;
+package com.roosher.storm.xmpp;
 
 import org.jivesoftware.openfire.roster.Roster;
 import org.jivesoftware.openfire.roster.RosterEventListener;
@@ -6,8 +6,8 @@ import org.jivesoftware.openfire.roster.RosterItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.roosher.strom.xmpp.blacklist.BlockList;
-import com.roosher.strom.xmpp.blacklist.RemoteBlockList;
+import com.roosher.storm.xmpp.blocklist.BlockList;
+import com.roosher.storm.xmpp.blocklist.RemoteBlockList;
 
 public class StormRosterListener implements RosterEventListener{
     
@@ -35,6 +35,9 @@ public class StormRosterListener implements RosterEventListener{
                 new Object[]{roster, item, persistent});
         
         boolean blocked = blockList.isBlocked(roster.getUsername(), item.getJid());
+        
+        //分发 某个人被屏蔽的ofRoster去
+        
         return !blocked;//没有被屏蔽才加入
     }
 
