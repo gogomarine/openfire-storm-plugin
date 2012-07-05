@@ -1,0 +1,11 @@
+.classpath
+.project
+target/*
+bin/*
+.settings/*
+src/main/resources/rebel.xml
+#给 jrebel生成的xml配置文件
+src/main/resources/rebel.xml
+
+.idea/*
+META-INF/*

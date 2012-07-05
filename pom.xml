@@ -1,0 +1,294 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.roosher.storm</groupId>
+	<artifactId>storm-plugin</artifactId>
+	<packaging>openfire-plugin</packaging>
+	<version>1.0.0</version>
+	<name>storm</name>
+	<description>xmpp plugin for zaizher</description>
+    
+    <developers>
+        <developer>
+            <id>gogo</id>
+            <name>Gogo Cao</name>
+            <email>gogomatrix@gmail.com</email>
+            <organization>Roosher inc.</organization>
+            <organizationUrl>http://www.zaizher.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    
+	<repositories>
+		<!-- for mango of company -->
+		<repository>
+			<id>foxflypro.gicp.net</id>
+			<url>http://foxflypro.gicp.net:8081/nexus/content/groups/public</url>
+		</repository>
+
+	    <!-- for mango of company -->
+	    <repository>
+	      <id>mango</id>
+	      <url>http://repos.ipush.com:8081/nexus/content/groups/public</url>
+	    </repository>
+
+ 		<repository>
+            <id>maven</id>
+            <name>Slowly office site</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+
+		<repository>
+			<id>maven.net.cn</id>
+			<url>http://maven.net.cn/content/groups/public/</url>
+		</repository>
+
+		<repository>
+			<id>cedarsoft-thirdparty</id>
+			<url>http://maven.cedarsoft.com/content/repositories/thirdparty/
+			</url>
+		</repository>
+		<!--
+			<repository> <id>central</id>
+			<url>http://repo1.maven.org/maven2/</url> <releases>
+			<enabled>true</enabled> </releases> <snapshots>
+			<enabled>false</enabled> </snapshots> </repository>
+		-->
+		<repository>
+			<id>ibiblio</id>
+			<url>http://mirrors.ibiblio.org/pub/mirrors/maven2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<!-- for netty -->
+		<repository>
+			<id>repository.jboss.org</id>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/
+			</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<!--
+            For Hibernate Validator -->
+		<repository>
+			<id>org.jboss.repository.releases</id>
+			<name>JBoss Maven Release Repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/releases
+			</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<!-- For Rome -->
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+
+			<!--
+				<repository> <id>SpringSource Enterprise Bundle Repository –
+				External Bundle Milestones</id>
+				<url>http://repository.springsource.com/maven/bundles/milestone</url>
+				</repository> <repository> <id>SpringSource Enterprise Bundle
+				Repository – SpringSource Bundle Releases</id>
+				<url>http://repository.springsource.com/maven/bundles/release</url>
+				</repository> <repository> <id>SpringSource Enterprise Bundle
+				Repository – External Bundle Releases</id>
+				<url>http://repository.springsource.com/maven/bundles/external</url>
+				</repository>
+			-->
+		</repository>
+
+        <repository>
+            <id>OSGEO GeoTools repo</id>
+            <url>http://download.osgeo.org/webdav/geotools</url>
+        </repository>
+        <repository>
+            <id>Hibernate Spatial repo</id>
+            <url>http://www.hibernatespatial.org/repository</url>
+        </repository>
+		
+		<!-- For jackson -->
+	  <repository>
+	   <id>codehaus-snapshots</id>
+	   <url>http://snapshots.repository.codehaus.org</url> 
+	  </repository>
+	</repositories>
+
+	<dependencies>
+        <dependency>
+            <groupId>org.jivesoftware.openfire</groupId>
+            <artifactId>openfire</artifactId>
+            <version>3.7.2</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <!-- xmpp external component start -->
+        <dependency>
+           <groupId>org.jivesoftware</groupId>
+           <artifactId>whack</artifactId>
+           <version>1.1</version>
+           <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>xpp3</groupId>
+            <artifactId>xpp3</artifactId>
+            <version>1.1.4c</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jivesoftware</groupId>
+            <artifactId>stringprep</artifactId>
+            <version>1.0</version> 
+            <scope>provided</scope> 
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>skiptests</id>
+			<activation>
+				<property>
+					<name>!maven.test.skip</name>
+				</property>
+			</activation>
+			<properties>
+				<maven.test.skip>false</maven.test.skip>
+			</properties>
+		</profile>
+	</profiles>
+
+
+	<build>
+		<plugins>
+			<!--
+				tell the compiler we can use 1.5; we only need this for
+				eclipse:eclipse compatibility
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<encoding>utf-8</encoding>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>maven-jetty-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>com.reucon.maven.plugins</groupId>
+				<artifactId>maven-openfire-plugin</artifactId>
+				<extensions>true</extensions>
+		        <configuration>
+		          <jspPackageName>halo-prop-admin.jsp</jspPackageName>
+		        </configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<!--
+						<junitArtifactName>org.junit:com.springsource.org.junit</junitArtifactName>
+						<testFailureIgnore>true</testFailureIgnore>
+					-->
+					<reportFormat>brief</reportFormat>
+					<useFile>true</useFile>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.0.4</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.2</version>
+			</plugin>
+			<!-- IDE -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.5.1</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>false</downloadJavadocs>
+					<wtpversion>2.0</wtpversion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<java-version>1.6</java-version>
+		<spring.version>3.1.0.RELEASE</spring.version>
+		<org.aspectj-version>2.0.0</org.aspectj-version>
+		<slf4j.version>1.6.1</slf4j.version>
+        <logback.version>0.9.26</logback.version>
+
+		<webflow.version>2.0.8.RELEASE</webflow.version>
+		<spring.security.version>3.0.7.RELEASE</spring.security.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+</project>

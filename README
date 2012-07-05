@@ -1,0 +1,12 @@
+maven-openfire插件的具体详情参考http://maven.reucon.com/projects/public/maven-openfire-plugin/1.0.1/
+  1. 关于打包, 仔细查看plugins需要的元素，比如说
+       <!-- Admin console meta-data -->
+       <adminconsole>
+       </adminconsole>
+     plugin.xml中必须有这个节点，否则出错
+  2. 通过maven插件打包，如果需要把jar包打到最终的发布包里，则需要修改pom.xml文件，删除该<scope>provided</scope>
+     节点即可，不需要的，就可以保留该选项
+       
+
+关于plugin开发的官方首页: http://www.igniterealtime.org/builds/openfire/docs/latest/documentation/plugin-dev-guide.html
+
