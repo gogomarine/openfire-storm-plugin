@@ -134,6 +134,14 @@
             <scope>provided</scope>
         </dependency>
         
+        <!-- Xmpp packet -->
+		<dependency>
+		  <groupId>org.igniterealtime</groupId>
+		  <artifactId>tinder</artifactId>
+		  <version>1.2.3</version>
+		  <scope>provided</scope>
+		</dependency>
+        
         <!-- xmpp external component start -->
         <dependency>
            <groupId>org.jivesoftware</groupId>
@@ -168,6 +176,28 @@
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
         </dependency>
+
+        <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>r09</version>
+        </dependency>
+        
+        <!-- Mock -->
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.8</version>
+          <scope>test</scope>
+        </dependency>
+
 	</dependencies>
 
 	<profiles>

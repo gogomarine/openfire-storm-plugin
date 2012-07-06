@@ -61,9 +61,10 @@ public class StormPlugin implements Plugin{
         
         PropertyEventDispatcher.removeListener(haloPropertyEventListener);
 
-        interceptorManager.removeInterceptor(blockListPacketInterceptor);
-        
+        // 先于转发完目前的任务，然后再移除黑名单。
         blockListPacketInterceptor.onTerminal();
+        
+        interceptorManager.removeInterceptor(blockListPacketInterceptor);
         
         RosterEventDispatcher.removeListener(rosterListener);
     }

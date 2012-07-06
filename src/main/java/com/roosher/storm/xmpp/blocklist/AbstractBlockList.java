@@ -30,9 +30,9 @@ public abstract class AbstractBlockList implements BlockList{
             throw new IllegalArgumentException("new contact jid can't be null");
         }
         
-//        if (StringUtils.equals(newContact.getNode(), "lady")) {
-//            return true;
-//        }
+        if (newContact.getNode() != null) {
+            return true;
+        }
         
         if (StringUtils.isBlank(username) || !StringUtils.isNumeric(username)) {
             logger.debug("源用户的JID Node节点为空(非数字)，所以直接返回");

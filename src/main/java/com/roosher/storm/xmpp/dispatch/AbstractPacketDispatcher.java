@@ -44,11 +44,22 @@ public abstract class AbstractPacketDispatcher implements PacketDispatcher{
     
     @Override
     public void dispatch(Packet packet) {
-        dispatchService.submit(new DispachTask(packet));
+        dispatch(packet, true);
+    }
+    
+    @Override
+    public void dispatch(Packet packet, boolean async) {
+        if (async) {
+            dispatchService.submit(new DispachTask(packet));
+        } else {
+            doProcessPacket(packet);
+        }
     }
     
     private void initilize() {
         if (dispatchService == null) {
+            //XXX 换成自己实现的线程池，自己持有 BlockedQueueLinkedList的引用，在结束的时候
+            //进行dump，避免丢失信息，并且在开始的时候，进行读取dump信息
             dispatchService = Executors.newFixedThreadPool(2, dispatchFactory);
         }
     }
@@ -64,7 +75,7 @@ public abstract class AbstractPacketDispatcher implements PacketDispatcher{
     public void onTerminal() {
         synchronized (this) {
             try {
-                dispatchService.awaitTermination(10l, TimeUnit.SECONDS);
+                dispatchService.awaitTermination(5l, TimeUnit.SECONDS);
                 
                 dispatchService = null;
             } catch (InterruptedException e) {
@@ -82,24 +93,44 @@ public abstract class AbstractPacketDispatcher implements PacketDispatcher{
         
         @Override
         public Void call() throws Exception {
-            if (packet instanceof IQ) {
-                process((IQ) packet);
-            } else if (packet instanceof Message) {
-                process((Message) packet);
-            } else if (packet instanceof Presence) {
-                process((Presence) packet);
-            } else {
-                //no idea 
-                throw new IllegalAccessError("can't support packet type: " + packet.getClass().getName());
-            }
+            doProcessPacket(packet);
             return null;
         }
     }
     
+    /**
+     * 真正的处理xmpp包
+     * @param packet
+     */
+    protected void doProcessPacket(Packet packet) {
+        if (packet instanceof IQ) {
+            process((IQ) packet);
+        } else if (packet instanceof Message) {
+            process((Message) packet);
+        } else if (packet instanceof Presence) {
+            process((Presence) packet);
+        } else {
+            //no idea 
+            throw new IllegalAccessError("can't support packet type: " + packet.getClass().getName());
+        }
+    }
+    
+    /**
+     * 处理IQ包
+     * @param iq
+     */
     protected void process(IQ iq) {}
     
+    /**
+     * 处理消息包
+     * @param message
+     */
     protected void process(Message message) {}
     
+    /**
+     * 处理 在线信息
+     * @param presence
+     */
     protected void process(Presence presence) {}
     
 }
