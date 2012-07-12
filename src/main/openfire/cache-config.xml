@@ -17,11 +17,11 @@
             </init-param>
             <init-param>
                 <param-name>back-expiry</param-name>
-                <param-value>0</param-value>
+                <param-value>1d</param-value>
             </init-param>
             <init-param>
                 <param-name>back-size-low</param-name>
-                <param-value>2h</param-value>
+                <param-value>0</param-value>
             </init-param>
         </init-params>
     </cache-mapping>
