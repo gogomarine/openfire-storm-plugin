@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.roosher.storm.xmpp.blocklist.BlockList;
-import com.roosher.storm.xmpp.blocklist.RemoteBlockList;
+import com.roosher.storm.xmpp.blocklist.DatabaseBlockList;
 
 public class StormRosterListener implements RosterEventListener{
     
@@ -16,7 +16,7 @@ public class StormRosterListener implements RosterEventListener{
     private BlockList blockList;
     
     public StormRosterListener() {
-        blockList = new RemoteBlockList();
+        blockList = new DatabaseBlockList();
     }
     
     public void setBlockList(BlockList blockList) {

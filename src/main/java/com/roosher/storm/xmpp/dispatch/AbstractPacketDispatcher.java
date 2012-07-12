@@ -75,9 +75,11 @@ public abstract class AbstractPacketDispatcher implements PacketDispatcher{
     public void onTerminal() {
         synchronized (this) {
             try {
-                dispatchService.awaitTermination(5l, TimeUnit.SECONDS);
-                
-                dispatchService = null;
+                if (dispatchService != null) {
+                    dispatchService.awaitTermination(5l, TimeUnit.SECONDS);
+                    
+                    dispatchService = null;
+                }
             } catch (InterruptedException e) {
                 //XXX 暂时不用做什么事情，除非我们有非常强烈的需求 不能丢失这种系统级别的信息
             }

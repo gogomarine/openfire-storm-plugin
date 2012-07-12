@@ -1,0 +1,28 @@
+<cache-config>
+    <cache-mapping>
+        <cache-name>Block List Cache</cache-name>
+        <scheme-name>optimistic</scheme-name>
+  <!-- The next three init-param elements should be present for each cache. 
+    The back-size-high parameter defines the maximum size in bytes for the cache. 
+    When the cache tries to exceed that size content from the cache will be removed 
+    and it will try to go to the size defined by the back-size-low parameter. 
+    The back-expiry parameter defines the time a content can stay in the cache 
+    before it is removed. The expiration time can be defined in minutes (e.g. 
+    30m) or in hours (e.g. 2h) or in days (e.g. 2d). Using a value of zero in 
+    any of these parameters is a way to set no limit or expiration time. -->
+        <init-params>
+            <init-param>
+                <param-name>back-size-high</param-name>
+                <param-value>0</param-value>
+            </init-param>
+            <init-param>
+                <param-name>back-expiry</param-name>
+                <param-value>0</param-value>
+            </init-param>
+            <init-param>
+                <param-name>back-size-low</param-name>
+                <param-value>2h</param-value>
+            </init-param>
+        </init-params>
+    </cache-mapping>
+</cache-config>

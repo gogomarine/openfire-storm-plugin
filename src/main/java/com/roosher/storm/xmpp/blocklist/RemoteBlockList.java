@@ -8,7 +8,7 @@ package com.roosher.storm.xmpp.blocklist;
 public class RemoteBlockList extends AbstractBlockList {
     
     @Override
-    public boolean isBlocked(int sourceId, int newContactId) {
+    public boolean isBlocked(String sourceId, String newContactId) {
         return true;
     }
 

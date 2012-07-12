@@ -13,6 +13,7 @@ import com.roosher.storm.xmpp.BlockListPacketInterceptor;
 import com.roosher.storm.xmpp.StormIQHandler;
 import com.roosher.storm.xmpp.StormPropertyEventListener;
 import com.roosher.storm.xmpp.StormRosterListener;
+import com.roosher.storm.xmpp.cache.BlockListCache;
 
 /**
  * 
@@ -30,6 +31,8 @@ public class StormPlugin implements Plugin{
     private InterceptorManager interceptorManager;
     private StormRosterListener rosterListener;
     
+    private BlockListCache blockListCache;
+    
     public StormPlugin() {
         haloPropertyEventListener = new StormPropertyEventListener();
         debugIQHandler = new StormIQHandler();
@@ -38,10 +41,15 @@ public class StormPlugin implements Plugin{
         interceptorManager = InterceptorManager.getInstance();
         
         rosterListener = new StormRosterListener();
+        
+        blockListCache = BlockListCache.getInstance();
     }
 
     @Override
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
+        
+        blockListCache.onStartup();
+        
         XMPPServer xmppServer = XMPPServer.getInstance();
         xmppServer.getIQRouter().addHandler(debugIQHandler);
         PropertyEventDispatcher.addListener(haloPropertyEventListener);
@@ -67,6 +75,8 @@ public class StormPlugin implements Plugin{
         interceptorManager.removeInterceptor(blockListPacketInterceptor);
         
         RosterEventDispatcher.removeListener(rosterListener);
+        
+        blockListCache.onTerminal();
     }
     
     

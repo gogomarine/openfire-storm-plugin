@@ -4,9 +4,18 @@ maven-openfire插件的具体详情参考http://maven.reucon.com/projects/public
        <adminconsole>
        </adminconsole>
      plugin.xml中必须有这个节点，否则出错
+       1. 如果要安装数据库，必须要有<databaseVersion>0</databaseVersion>节点，0表示初始化的结构，之后的版本都应该在
+          upgrade文件夹中
   2. 通过maven插件打包，如果需要把jar包打到最终的发布包里，则需要修改pom.xml文件，删除该<scope>provided</scope>
      节点即可，不需要的，就可以保留该选项
        
+关于plugin开发
+  1. 官方首页: http://www.igniterealtime.org/builds/openfire/docs/latest/documentation/plugin-dev-guide.html
+  2. 如何添加缓存: http://community.igniterealtime.org/docs/DOC-1322
+  
+关于数据库格式
+  1. 之所以选择Varchar(15)作为日期的存储，是为了更大程度的保持数据兼容
 
-关于plugin开发的官方首页: http://www.igniterealtime.org/builds/openfire/docs/latest/documentation/plugin-dev-guide.html
-
+关于日志
+  1. 插件自定义日志级别，应该是需要修改openfire的log4j.xml，该文件在$OPENFIRE_HOME/lib/log4j.xml中。
+     设置一个单独

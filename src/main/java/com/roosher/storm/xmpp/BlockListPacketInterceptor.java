@@ -1,5 +1,7 @@
 package com.roosher.storm.xmpp;
 
+import java.util.Iterator;
+
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.interceptor.PacketInterceptor;
 import org.jivesoftware.openfire.interceptor.PacketRejectedException;
@@ -15,7 +17,7 @@ import org.xmpp.packet.Roster;
 import org.xmpp.packet.Roster.Item;
 
 import com.roosher.storm.xmpp.blocklist.BlockList;
-import com.roosher.storm.xmpp.blocklist.RemoteBlockList;
+import com.roosher.storm.xmpp.blocklist.DatabaseBlockList;
 import com.roosher.storm.xmpp.dispatch.DirectRoutePacketDispatcher;
 import com.roosher.storm.xmpp.dispatch.PacketDispatcher;
 import com.roosher.storm.xmpp.lifecycle.OnStartup;
@@ -42,7 +44,7 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
     private PacketDispatcher packetDispatcher;
     
     public BlockListPacketInterceptor() {
-        blockList = new RemoteBlockList();
+        blockList = new DatabaseBlockList();
         notificationFrom = new JID(XMPPServer.getInstance().getServerInfo().getXMPPDomain());
         packetDispatcher = new DirectRoutePacketDispatcher();
     }
@@ -64,35 +66,32 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
     @Override
     public void interceptPacket(Packet packet, Session session,
             boolean incoming, boolean processed) throws PacketRejectedException {
-        logger.info("packet: {}, session: {}, incoming: {}, processed: {}",
-                new Object[]{packet.toString(), session.toString(), incoming, processed});
+//        logger.info("packet: {}, session: {}, incoming: {}, processed: {}",
+//                new Object[]{packet, session, incoming, processed});
         
+
         if(!isValidTargetPacket(packet, incoming, processed)) {
             return;
         }
         
-        logger.info("本次的发包符合需要屏蔽的条件，我们会一一过滤 packet: {}, session: {}, incoming: {}, processed: {}",
-                new Object[]{packet.toString(), session.toString(), incoming, processed});
+//        logger.info("本次的发包符合需要屏蔽的条件，我们会一一过滤 packet: {}, session: {}, incoming: {}, processed: {}",
+//                new Object[]{packet.toString(), session.toString(), incoming, processed});
         
         PacketRejectedException blockedException = null;
         
         JID from = packet.getFrom();
-        JID targetJid = null;
         
         if (packet instanceof Message) {
-            targetJid = packet.getTo();
+            JID targetJid = packet.getTo();
             if (blockList.isBlocked(targetJid, from)) {
                 blockedException = new PacketRejectedException("People in blocked list won't receive message");
             }
         } else if (packet instanceof Roster) {
             Roster roster = (Roster) packet;
-            //有可能客户端 传错了参数、比如说多添加了，因为加人只有一个参数，参数多了，是会报错的
-            //查阅错误节点: http://tools.ietf.org/id/draft-ietf-xmpp-3921bis-20.html#roster-add-errors
-            //目前测试过，如果客户端不正确处理删除联系人时，还是会让两个陌生人发送信息
-            if (roster.getType() == IQ.Type.set && roster.getItems() != null && roster.getItems().size() == 1) {
-                Item item = roster.getItems().iterator().next();
-                targetJid = item.getJID();
-                if (targetJid != null && item.getSubscription() != Roster.Subscription.remove) {//如果是删除的话，不检查是否为好友
+            if (needCheckBlocked(roster)) {//如果是删除的话，不检查是否为好友
+                Item item = getRosterItem(roster);
+                JID targetJid = null;
+                if (item != null && (targetJid = item.getJID()) != null) {
                     if (blockList.isBlocked(targetJid, from)) {
                         blockedException = new PacketRejectedException("People in blocked list won't allow add again");
                         
@@ -105,7 +104,7 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
             }
         }
         
-        if (blockedException == null || targetJid == null) {
+        if (blockedException == null) {
             return;//没有发现任何异常，也表示目前流程不需要再处理了
         }
         
@@ -116,7 +115,10 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
     }
     
     /**
-     * 我们只过滤需要检查的 Roster
+     * 我们只过滤需要检查的 Roster 有可能客户端 传错了参数、比如说多添加了，因为加人只有一个参数，参数多了，是会报错的 查阅错误节点:
+     * http://tools.ietf.org/id/draft-ietf-xmpp-3921bis-20.html#roster-add-errors
+     * 目前测试过，如果客户端不正确处理删除联系人时，还是会让两个陌生人发送信息
+     * 
      * @param roster
      * @return
      */
@@ -124,11 +126,53 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
         //有可能客户端 传错了参数、比如说多添加了，因为加人只有一个参数，参数多了，是会报错的
         //查阅错误节点: http://tools.ietf.org/id/draft-ietf-xmpp-3921bis-20.html#roster-add-errors
         //目前测试过，如果客户端不正确处理删除联系人时，还是会让两个陌生人发送信息
-        if (roster.getType() == IQ.Type.set && roster.getItems() != null && roster.getItems().size() == 1) {
+        if (roster.getType() == IQ.Type.set) {
+            Item item = getRosterItem(roster);
+            if (item == null) {
+                return false;
+            }
+            JID targetJID = item.getJID();
+            if (targetJID == null) {
+                return false;
+            }
             
+            if (item.getSubscription() != Roster.Subscription.remove) {
+                return true;
+            }
         }
         
         return false;
+    }
+    
+    /**
+     * 获取roster附带索引信息
+     * @param roster
+     * @param index
+     * @return
+     */
+    private Item getRosterItem(Roster roster, int index) {
+        if (roster.getItems() != null && !roster.getItems().isEmpty()) {
+            int i = 0;
+            for (Iterator<Item> iterator = roster.getItems().iterator(); iterator.hasNext();) {
+                Item item = iterator.next();
+                if (i == index) {
+                    return item;
+                } else {
+                    i++;//continue
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * 获取roster，默认从第一个
+     * @param roster
+     * @return
+     */
+    private Item getRosterItem(Roster roster) {
+        return getRosterItem(roster, 0);
     }
 
     protected IQ getBlockedIQ(Session session, Roster roster) {
@@ -157,13 +201,14 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
             return false;
         }
         
-        if (!(packet instanceof Roster)) {
+        if (!(packet instanceof Roster) && !(packet instanceof Message)) {
             return false;
         }
         
         return true;//默认都是合法的
     }
     
+    @SuppressWarnings("unused")
     private void sendBlockNotification(JID blocked, String subject, String body) {
         Message message = new Message();
         message.setTo(blocked);
