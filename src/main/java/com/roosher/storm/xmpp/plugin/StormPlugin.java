@@ -7,6 +7,7 @@ import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.interceptor.InterceptorManager;
 import org.jivesoftware.openfire.roster.RosterEventDispatcher;
+import org.jivesoftware.util.JiveGlobals;
 import org.jivesoftware.util.PropertyEventDispatcher;
 
 import com.roosher.storm.xmpp.BlockListPacketInterceptor;
@@ -22,10 +23,8 @@ import com.roosher.storm.xmpp.cache.BlockListCache;
  */
 public class StormPlugin implements Plugin{
     
-//    private static final Logger logger = LoggerFactory.getLogger(StormPlugin.class);
-    
     private StormPropertyEventListener haloPropertyEventListener;
-    private StormIQHandler debugIQHandler;
+//    private StormIQHandler debugIQHandler;
     private BlockListPacketInterceptor blockListPacketInterceptor;
     
     private InterceptorManager interceptorManager;
@@ -35,7 +34,7 @@ public class StormPlugin implements Plugin{
     
     public StormPlugin() {
         haloPropertyEventListener = new StormPropertyEventListener();
-        debugIQHandler = new StormIQHandler();
+//        debugIQHandler = new StormIQHandler();
         blockListPacketInterceptor = new BlockListPacketInterceptor();
         
         interceptorManager = InterceptorManager.getInstance();
@@ -47,11 +46,12 @@ public class StormPlugin implements Plugin{
 
     @Override
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
+        Environments.getInstance().reload();
         
         blockListCache.onStartup();
         
-        XMPPServer xmppServer = XMPPServer.getInstance();
-        xmppServer.getIQRouter().addHandler(debugIQHandler);
+//        XMPPServer xmppServer = XMPPServer.getInstance();
+//        xmppServer.getIQRouter().addHandler(debugIQHandler);
         PropertyEventDispatcher.addListener(haloPropertyEventListener);
         
         blockListPacketInterceptor.onStartup();
@@ -64,8 +64,8 @@ public class StormPlugin implements Plugin{
     @Override
     public void destroyPlugin() {
         
-        XMPPServer xmppServer = XMPPServer.getInstance();
-        xmppServer.getIQRouter().removeHandler(debugIQHandler);
+//        XMPPServer xmppServer = XMPPServer.getInstance();
+//        xmppServer.getIQRouter().removeHandler(debugIQHandler);
         
         PropertyEventDispatcher.removeListener(haloPropertyEventListener);
 
@@ -78,6 +78,18 @@ public class StormPlugin implements Plugin{
         
         blockListCache.onTerminal();
     }
-    
-    
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,6 +13,7 @@ import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
+import org.xmpp.packet.Presence;
 import org.xmpp.packet.Roster;
 import org.xmpp.packet.Roster.Item;
 
@@ -22,6 +23,7 @@ import com.roosher.storm.xmpp.dispatch.DirectRoutePacketDispatcher;
 import com.roosher.storm.xmpp.dispatch.PacketDispatcher;
 import com.roosher.storm.xmpp.lifecycle.OnStartup;
 import com.roosher.storm.xmpp.lifecycle.OnTerminal;
+import com.roosher.storm.xmpp.plugin.Environments;
 
 /**
  * 黑名单 拦截器，这里实现核心判断业务, 关于xmpp定义，查询
@@ -40,6 +42,8 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
      * violation notification messages will be from this JID
      */
     private JID notificationFrom;
+    
+    private Environments environments = Environments.getInstance();
     
     private PacketDispatcher packetDispatcher;
     
@@ -66,9 +70,11 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
     @Override
     public void interceptPacket(Packet packet, Session session,
             boolean incoming, boolean processed) throws PacketRejectedException {
-//        logger.info("packet: {}, session: {}, incoming: {}, processed: {}",
-//                new Object[]{packet, session, incoming, processed});
+        tracePaccket(packet, session, incoming, processed);
         
+        if (!environments.isBlocklistFilterEnabled()) {//配置屏蔽了黑名单过滤
+            return;
+        }
 
         if(!isValidTargetPacket(packet, incoming, processed)) {
             return;
@@ -112,6 +118,55 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
 //                targetJid.getNode()));
         
         throw blockedException;
+    }
+
+    /**
+     * 能够进这个方法，表示日志查看
+     * @param packet
+     * @param session
+     * @param incoming
+     * @param processed
+     */
+    private void tracePaccket(Packet packet, Session session, boolean incoming,
+            boolean processed) {
+        
+        if (!environments.isLogMonitorEnabled()) {//如果没有开启日志调试，直接返回
+            return;
+        }
+        
+        boolean trace = true;
+        if (packet instanceof IQ) {
+            trace = environments.isLogMonitorIQEnabled();
+        } else if (packet instanceof Message) {
+            trace = environments.isLogMonitorMessageEnabled();
+        } else if (packet instanceof Presence) {
+            trace = environments.isLogMonitorPresenceEnabled();
+        } else {
+            trace = environments.isLogMonitorOtherEnabled();//我们几乎不会有其他的包
+        }
+        
+        if (!trace) {
+            return;
+        }
+        
+        trace = ((environments.isLogMonitorIncomingEnabled() && incoming)
+                || (environments.isLogMonitorOutterEnabled() && !incoming));
+        
+        if (!trace) {//如果不符合 是否从 客户端过来的配置，则出去
+            return;
+        }
+        
+        trace = (environments.isLogMonitorProcessingEnabled() && !processed)
+                || (environments.isLogMonitorProcessedEnabled() && processed);
+        
+        if (!trace) {
+            return;
+        }
+                
+        if (trace) {//只有开启跟踪时，才会打印日志
+            logger.info("packet: {}, session: {}, incoming: {}, processed: {}",
+                    new Object[]{packet, session, incoming, processed});
+        }
     }
     
     /**

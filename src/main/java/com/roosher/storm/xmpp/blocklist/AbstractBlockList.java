@@ -7,6 +7,7 @@ import org.xmpp.packet.JID;
 
 import com.roosher.storm.util.StopWatch;
 import com.roosher.storm.xmpp.cache.BlockListCache;
+import com.roosher.storm.xmpp.plugin.Environments;
 
 /**
  * 实现黑名单接口，进行一层浅的封装，根据用户id查询是否是黑名单(这个是在这儿逻辑
@@ -20,8 +21,11 @@ public abstract class AbstractBlockList implements BlockList{
     
     protected BlockListCache blockListCache;
     
+    protected Environments environments;
+    
     public AbstractBlockList() {
         blockListCache = BlockListCache.getInstance();
+        environments = Environments.getInstance();
     }
     
     @Override
@@ -76,14 +80,20 @@ public abstract class AbstractBlockList implements BlockList{
      * @return
      */
     private boolean checkBlocked(String username, String contactNode) {
-        Boolean cachedBlock = blockListCache.isBlocked(username, contactNode);
-        if (cachedBlock != null) {//因为同步的问题(可能刚好到期)
-            return cachedBlock.booleanValue();
+        boolean useCache = environments.isBlocklistOpenfireCacheEnabled();
+        
+        if (useCache) {
+            Boolean cachedBlock = blockListCache.isBlocked(username, contactNode);
+            if (cachedBlock != null) {//因为同步的问题(可能刚好到期)
+                return cachedBlock.booleanValue();
+            }
         }
         //表示缓存没有捕获到
         boolean blocked = isBlocked(username, contactNode);
         
-        blockListCache.cacheBlocked(username, contactNode, blocked);
+        if (useCache) {
+            blockListCache.cacheBlocked(username, contactNode, blocked);
+        }
         
         return blocked;
     }

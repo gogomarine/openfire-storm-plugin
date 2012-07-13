@@ -20,9 +20,6 @@ public class StormIQHandler extends IQHandler{
     
     @Override
     public IQ handleIQ(IQ packet) throws UnauthorizedException {
-        
-        logger.debug("IQ packet: {}", packet.toString());
-        
         return packet;
     }
 

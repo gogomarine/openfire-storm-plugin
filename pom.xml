@@ -246,7 +246,7 @@
 				<artifactId>maven-openfire-plugin</artifactId>
 				<extensions>true</extensions>
 		        <configuration>
-		          <jspPackageName>halo-prop-admin.jsp</jspPackageName>
+		          <jspPackageName>com.roosher.storm.xmpp.jsp</jspPackageName>
 		        </configuration>
 			</plugin>
 			
@@ -308,6 +308,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+        <finalName>storm-blocklist</finalName>
 	</build>
 	<properties>
 		<java-version>1.6</java-version>
