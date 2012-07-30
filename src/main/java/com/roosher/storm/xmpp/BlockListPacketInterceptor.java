@@ -15,7 +15,9 @@ import org.xmpp.packet.Packet;
 import org.xmpp.packet.PacketError;
 import org.xmpp.packet.Presence;
 import org.xmpp.packet.Roster;
+import org.xmpp.packet.Roster.Ask;
 import org.xmpp.packet.Roster.Item;
+import org.xmpp.packet.Roster.Subscription;
 
 import com.roosher.storm.xmpp.blocklist.BlockList;
 import com.roosher.storm.xmpp.blocklist.DatabaseBlockList;
@@ -108,6 +110,14 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
                     }
                 }
             }
+        } else if (packet instanceof Presence) {
+            Presence presence = (Presence) packet;
+            if (presence.getType() == Presence.Type.subscribe) {
+                JID targetJid = presence.getTo();
+                if (blockList.isBlocked(targetJid, from)) {
+                    blockedException = new PacketRejectedException("People in blocked list won't receive message");
+                }
+            }
         }
         
         if (blockedException == null) {
@@ -191,7 +201,16 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
                 return false;
             }
             
-            if (item.getSubscription() != Roster.Subscription.remove) {
+            Subscription subscription = item.getSubscription();
+            Ask ask = item.getAsk();
+            
+            if ((subscription == null || subscription == Subscription.none)
+                && ask == Ask.unsubscribe){//不管是不是黑名单，是允许解除好友的
+                return false;
+            }
+            
+            //任何处于订阅状态下的，都需要屏蔽
+            if ((subscription != Roster.Subscription.remove) || ask == Ask.subscribe ) {
                 return true;
             }
         }
@@ -256,7 +275,8 @@ public class BlockListPacketInterceptor implements PacketInterceptor, OnStartup,
             return false;
         }
         
-        if (!(packet instanceof Roster) && !(packet instanceof Message)) {
+        if (!(packet instanceof Roster) && !(packet instanceof Message)
+                && !(packet instanceof Presence)) {
             return false;
         }
         

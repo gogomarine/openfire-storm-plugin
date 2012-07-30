@@ -4,7 +4,7 @@
 	<groupId>com.roosher.storm</groupId>
 	<artifactId>storm-plugin</artifactId>
 	<packaging>openfire-plugin</packaging>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>storm</name>
 	<description>Zaizher business extension with Openfire</description>
     
